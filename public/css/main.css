@@ -1,0 +1,14 @@
+.hero {
+  width: 100%;
+  height: auto;
+}
+
+.text {
+  font-size: 1.4rem;
+  text-align: center;
+  color: white; 
+}
+
+#image {
+  margin-bottom: 0.5rem;
+}

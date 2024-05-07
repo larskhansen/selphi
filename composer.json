@@ -1,0 +1,20 @@
+{
+    "name": "larshansen/selphi",
+    "description": "Gallery site for a wedding",
+    "type": "project",
+    "require": {
+        "twbs/bootstrap": "^5.3",
+        "twig/twig": "^3.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Larshansen\\Selphi\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "larskhansen",
+            "email": "larskhansen@gmail.com"
+        }
+    ]
+}
