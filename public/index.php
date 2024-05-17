@@ -11,9 +11,12 @@ $flash = new Flash();
 $selphi = new SelPhi();
 
 if ($_SERVER['REQUEST_METHOD'] === "POST") {
-  // Set cookie for the name input field and the images.
-  setcookie("name", $_POST["name"], time()+86400, "/", "rshansen.dk", 1);
-  $selphi->uploadImage($_FILES['image'], $_POST["name"]);
+  $cookie_name = isset($_POST['name']) ? $_POST["name"] : (isset($_COOKIE["name"]) ? $_COOKIE["name"] : "");
+  if ($cookie_name !== "") {
+    // Set cookie for the name input field and the images.
+    setcookie("name", $cookie_name, time()+86400, "/", "rshansen.dk", 1);
+    $selphi->uploadImage($_FILES['image'], $cookie_name);
+  }
 }
 $name = $_COOKIE['name'] ?? "";
 $loader = new \Twig\Loader\FilesystemLoader('../src/template');
@@ -24,6 +27,7 @@ echo $twig->render(
   'index.html', 
   [
     'name' => $name, 
-    'messages' => $flash->flash()
+    'messages' => $flash->flash(),
+    'enablednamefield' => !($name !== ""),
   ]
 );

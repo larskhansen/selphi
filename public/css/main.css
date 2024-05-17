@@ -9,6 +9,10 @@
   color: white; 
 }
 
+.readonly-text {
+  border: 0 !important;
+}
+
 #image {
   margin-bottom: 0.5rem;
 }

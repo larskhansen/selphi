@@ -9,6 +9,17 @@ class SelPhi {
     'image/jpeg' => 'jpg'
   ];
   
+  private const MESSAGES = [
+    UPLOAD_ERR_OK => 'Filen er uploaded',
+    UPLOAD_ERR_INI_SIZE => 'Filen er for stor',
+    UPLOAD_ERR_FORM_SIZE => 'Filen er for stor',
+    UPLOAD_ERR_PARTIAL => 'Filen er kun delvist uploaded',
+    UPLOAD_ERR_NO_FILE => 'Ingen fil blev uploaded',
+    UPLOAD_ERR_NO_TMP_DIR => 'Fejl i tmp opsætning af server',
+    UPLOAD_ERR_CANT_WRITE => 'Filen blev ikke gemt på disk',
+    UPLOAD_ERR_EXTENSION => 'Fil typen må ikke uploades på serveren',
+  ];
+
   private $errors;
   private const MAX_SIZE = 5 * 1024 * 1024; //  5MB
   
@@ -33,7 +44,7 @@ class SelPhi {
   
       // an error occurs
       if ($status !== UPLOAD_ERR_OK) {
-          $this->errors[$filename] = UploadFile::MESSAGES[$status];
+          $this->errors[$filename] = SELF::MESSAGES[$status];
           continue;
       }
       // validate the file size
@@ -57,7 +68,7 @@ class SelPhi {
   }
   
   if ($this->errors) {
-      $this->redirect_with_message($this->format_messages('The following errors occurred:',$errors), FLASH::FLASH_ERROR);
+      $this->redirect_with_message($this->format_messages('The following errors occurred:',$this->errors), FLASH::FLASH_ERROR);
   }
 
   // move the files
@@ -67,20 +78,26 @@ class SelPhi {
       $mime_type = $this->get_mime_type($tmp);
   
       // set the filename as the basename + extension
-      $uploaded_file = pathinfo($filename, PATHINFO_FILENAME) . '.' . SELF::ALLOWED_FILES[$mime_type];
+      $uploadedFile = pathinfo($filename, PATHINFO_FILENAME) . '.' . SELF::ALLOWED_FILES[$mime_type];
+      $folderStructur = SELF::UPLOAD_DIR . '/' . str_replace(" ", "", strtolower($name));
+      if (!is_dir($folderStructur)) {
+        mkdir($folderStructur);
+      }
+
       // new filepath
-      $filepath = SELF::UPLOAD_DIR . '/' . str_replace(" ", "", strtolower($name)) . '/' . $uploaded_file;
+      
+      $filepath = $folderStructur . '/' . $uploadedFile;
   
       // move the file to the upload dir
       $success = move_uploaded_file($tmp, $filepath);
       if(!$success) {
-          $this->errors[$filename] = "The file $filename was failed to move.";
+        $this->errors[$filename] = "The file $filename was failed to move.";
       }
   }
   
   $this->errors ?
-      $this->redirect_with_message($this->format_messages('The following errors occurred:',$this->errors), FLASH::FLASH_ERROR) :
-      $this->redirect_with_message('All the files were uploaded successfully.', FLASH::FLASH_SUCCESS);
+    $this->redirect_with_message($this->format_messages('The following errors occurred:',$this->errors), FLASH::FLASH_ERROR) :
+    $this->redirect_with_message('All the files were uploaded successfully.', FLASH::FLASH_SUCCESS);
   }
 
   /**
@@ -92,7 +109,7 @@ class SelPhi {
    * @param string location
    * 
    */
-  private function redirect_with_message(string $message, string $type=Flash::FLASH_ERROR, string $name='upload', string $location='index.php'): void {
+  private function redirect_with_message(string $message, string $type=Flash::FLASH_ERROR, string $name='upload', string $location='./'): void {
     $flash = new Flash();
     $flash->flash($name, $message, $type);
     header("Location: $location", true, 303);
