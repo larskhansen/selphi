@@ -1,11 +1,13 @@
 name: selphi
 recipe: lamp
 config:
-  webroot: web
+  webroot: public
   php: 8.1
   xdebug: true
 services:
   appserver:
+    build:
+      - mv /app/vendor/twbs/bootstrap/dist/css/bootstrap.css /app/public/css/bootstrap.css
     overrides:
       environment:
         PHP_IDE_CONFIG: "serverName=PHPSTORM"

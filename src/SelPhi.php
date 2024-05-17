@@ -23,7 +23,7 @@ class SelPhi {
   private $errors;
   private const MAX_SIZE = 5 * 1024 * 1024; //  5MB
   
-  private const UPLOAD_DIR = __DIR__ . '/../public/upload';
+  private const UPLOAD_DIR = '/upload';
 
   public function __construct() {
   }
@@ -33,7 +33,7 @@ class SelPhi {
     $has_file = isset($files);
     $file_count = count($files['name']);
     if (!$has_file) {
-      $this->redirect_with_message('Invalid file upload operation', Flash::FLASH_ERROR);
+      throw new \RuntimeException('Invalid file upload operation');
     }
 
     for ($i = 0; $i < $file_count; $i++) {
@@ -44,44 +44,42 @@ class SelPhi {
   
       // an error occurs
       if ($status !== UPLOAD_ERR_OK) {
-          $this->errors[$filename] = SELF::MESSAGES[$status];
-          continue;
+          throw new \RuntimeException(self::MESSAGES[$status]);
       }
       // validate the file size
       $filesize = filesize($tmp);
   
-      if ($filesize > SELF::MAX_SIZE) {
+      if ($filesize > self::MAX_SIZE) {
           // construct an error message
           $message = sprintf("The file %s is %s which is greater than the allowed size %s",
               $filename,
               $this->format_filesize($filesize),
-              $this->format_filesize(SELF::MAX_SIZE));
-  
-          $this->errors[$filesize] = $message;
-          continue;
+              $this->format_filesize(self::MAX_SIZE));
+
+        throw new \RuntimeException(self::MESSAGES[$status]);
       }
   
       // validate the file type
-      if (!in_array($this->get_mime_type($tmp), array_keys(SELF::ALLOWED_FILES))) {
-          $this->errors[$filename] = "The file $filename is allowed to upload";
+      if (!array_key_exists($this->get_mime_type($tmp), self::ALLOWED_FILES)) {
+        throw new \RuntimeException("The file $filename is not allowed to upload");
       }
-  }
-  
-  if ($this->errors) {
-      $this->redirect_with_message($this->format_messages('The following errors occurred:',$this->errors), FLASH::FLASH_ERROR);
-  }
+    }
 
-  // move the files
-  for($i = 0; $i < $file_count; $i++) {
+
+    // move the files
+    for($i = 0; $i < $file_count; $i++) {
       $filename = $files['name'][$i];
       $tmp = $files['tmp_name'][$i];
       $mime_type = $this->get_mime_type($tmp);
   
       // set the filename as the basename + extension
-      $uploadedFile = pathinfo($filename, PATHINFO_FILENAME) . '.' . SELF::ALLOWED_FILES[$mime_type];
-      $folderStructur = SELF::UPLOAD_DIR . '/' . str_replace(" ", "", strtolower($name));
+      $uploadedFile = pathinfo($filename, PATHINFO_FILENAME) . '.' . self::ALLOWED_FILES[$mime_type];
+      $folderStructur = getcwd() . self::UPLOAD_DIR . '/' . str_replace(" ", "", strtolower($name));
+
       if (!is_dir($folderStructur)) {
-        mkdir($folderStructur);
+        if (!mkdir($folderStructur) && !is_dir($folderStructur)) {
+          throw new \RuntimeException(sprintf('Directory "%s" was not created', $folderStructur));
+        }
       }
 
       // new filepath
@@ -93,38 +91,9 @@ class SelPhi {
       if(!$success) {
         $this->errors[$filename] = "The file $filename was failed to move.";
       }
-  }
-  
-  $this->errors ?
-    $this->redirect_with_message($this->format_messages('The following errors occurred:',$this->errors), FLASH::FLASH_ERROR) :
-    $this->redirect_with_message('All the files were uploaded successfully.', FLASH::FLASH_SUCCESS);
-  }
-
-  /**
-   * Redirect with a human readable message for Flash.
-   * 
-   * @param string message
-   * @param string type
-   * @param string name
-   * @param string location
-   * 
-   */
-  private function redirect_with_message(string $message, string $type=Flash::FLASH_ERROR, string $name='upload', string $location='./'): void {
-    $flash = new Flash();
-    $flash->flash($name, $message, $type);
-    header("Location: $location", true, 303);
+    }
+    header("Location: /", true, 303);
     exit;
-  }
-
-  private function format_messages(string $title, array $messages): string {
-      $message = "<p>$title</p>";
-      $message .= '<ul>';
-      foreach ($messages as $key => $value) {
-          $message .= "<li>$value</li>";
-      }
-      $message .= '<ul>';
-  
-      return $message;
   }
 
   private function get_mime_type(string $filename) {
@@ -145,10 +114,10 @@ class SelPhi {
    * @param int $decimals
    * @return string
    */
-  function format_filesize(int $bytes, int $decimals = 2): string {
+  private function format_filesize(int $bytes, int $decimals = 2): string {
     $units = 'BKMGTP';
     $factor = floor((strlen($bytes) - 1) / 3);
 
-    return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . $units[(int)$factor];
+    return sprintf("%.{$decimals}f", $bytes / (1024 ** $factor)) . $units[(int)$factor];
   }
 }

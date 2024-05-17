@@ -13,7 +13,7 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image:alt" content="Brylluppét 2024">
 
-    <link rel="stylesheet" href="../vendor/twbs/bootstrap/dist/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/bootstrap.css" crossorigin="anonymous">
     <link rel="stylesheet" href="css/main.css">
     <!--
     <link rel="stylesheet" href="css/photoswipe.css">
@@ -31,7 +31,7 @@
         </div>
       </div>
       <div class="container">
-        <form enctype="multipart/form-data" action="/selphi/public/" method="post">
+        <form enctype="multipart/form-data" action="/" method="post">
           <input id="image" name="image[]" type="file" multiple accept="image/jpeg">
           {% if enablednamefield == true %}
           <div class="input-group mb-3">
@@ -41,11 +41,6 @@
           {% else %}
             <button class="btn btn-outline-primary" type="submit" id="button-addon2">Upload</button>
           {% endif %}
-          <div>
-            {% for message in messages %}
-              {{ message|e }}
-            {% endfor %}
-          </div>
         </form>
         <hr />
         <h3>Billeder...</h3>
