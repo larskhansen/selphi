@@ -1,0 +1,47 @@
+name: selphi-develop
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+jobs:
+  buildx:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set up Docker Buildx
+      id: buildx
+      uses: crazy-max/ghaction-docker-buildx@v1
+      with:
+        buildx-version: latest
+        qemu-version: latest
+
+    - name: Prepare
+      if: success()
+      id: prepare
+      run: |
+        echo ::set-output name=docker_platforms::linux/amd64
+        echo ::set-output name=docker_username::larskhansen
+        echo ::set-output name=docker_image::docker.io/larskhansen/selphi-dev
+        echo ::set-output name=version::${GITHUB_REF#refs/*/}
+        echo ::set-output name=hash::${GITHUB_SHA}
+        echo ::set-output name=build_number::${GITHUB_RUN_NUMBER}
+    - name: Docker Login
+      if: success()
+      env:
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      run: |
+        echo "${DOCKER_PASSWORD}" | docker login --username "${{ steps.prepare.outputs.docker_username }}" --password-stdin docker.io
+    - name: Run Buildx (develop)
+      if: success() && contains(steps.prepare.outputs.version, 'develop')
+      run: |
+        docker buildx build \
+          --output type=image,name=${{ steps.prepare.outputs.docker_image }},push=true \
+          --platform ${{ steps.prepare.outputs.docker_platforms }} \
+          --tag "${{ steps.prepare.outputs.docker_image }}:${{ steps.prepare.outputs.build_number }}" \
+          --file docker/Dockerfile .

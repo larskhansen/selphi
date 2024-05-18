@@ -4,48 +4,120 @@ namespace Larshansen\Selphi;
 
 class SelPhi {
 
-  private $target_dir = "uploads/";
-  private $target_file;
-  private $uploadOk = 1;
-  private $files = [];
+  private const ALLOWED_FILES = [
+    'image/png' => 'png',
+    'image/jpeg' => 'jpg'
+  ];
+  
+  private const MESSAGES = [
+    UPLOAD_ERR_OK => 'Filen er uploaded',
+    UPLOAD_ERR_INI_SIZE => 'Filen er for stor',
+    UPLOAD_ERR_FORM_SIZE => 'Filen er for stor',
+    UPLOAD_ERR_PARTIAL => 'Filen er kun delvist uploaded',
+    UPLOAD_ERR_NO_FILE => 'Ingen fil blev uploaded',
+    UPLOAD_ERR_NO_TMP_DIR => 'Fejl i tmp opsætning af server',
+    UPLOAD_ERR_CANT_WRITE => 'Filen blev ikke gemt på disk',
+    UPLOAD_ERR_EXTENSION => 'Fil typen må ikke uploades på serveren',
+  ];
+
+  private $errors;
+  private const MAX_SIZE = 5 * 1024 * 1024; //  5MB
+  
+  private const UPLOAD_DIR = '/upload';
 
   public function __construct() {
-
   }
 
-  public function uploadImage($files) {
-    var_dump($files);
-    $this->files = $files;
-    $this->target_file = $this->target_dir . basename($this->files["fileToUpload"]["name"]);
-    $imageFileType = strtolower(pathinfo($this->target_file,PATHINFO_EXTENSION));
-    $check = getimagesize($this->files["fileToUpload"]["tmp_name"]);
-    if($check !== false) {
-      echo "File is an image - " . $check["mime"] . ".";
-      $this->uploadOk = 1;
-    } else {
-      echo "File is not an image.";
-      $this->uploadOk = 0;
+  public function uploadImage(array $files, string $name): void {
+    
+    $has_file = isset($files);
+    $file_count = count($files['name']);
+    if (!$has_file) {
+      throw new \RuntimeException('Invalid file upload operation');
     }
-    // Check if file already exists
-    $this->file_exits();
-    // Check if file is to big
-    $this->file_to_big();
-    if (move_uploaded_file($this->files["fileToUpload"]["tmp_name"], $this->target_file)) {
-      echo "The file ". htmlspecialchars( basename( $this->files["fileToUpload"]["name"])). " has been uploaded.";
-    }
+
+    for ($i = 0; $i < $file_count; $i++) {
+      // get the uploaded file info
+      $status = $files['error'][$i];
+      $filename = $files['name'][$i];
+      $tmp = $files['tmp_name'][$i];
   
-  }
+      // an error occurs
+      if ($status !== UPLOAD_ERR_OK) {
+          throw new \RuntimeException(self::MESSAGES[$status]);
+      }
+      // validate the file size
+      $filesize = filesize($tmp);
+  
+      if ($filesize > self::MAX_SIZE) {
+          // construct an error message
+          $message = sprintf("The file %s is %s which is greater than the allowed size %s",
+              $filename,
+              $this->format_filesize($filesize),
+              $this->format_filesize(self::MAX_SIZE));
 
-  private function file_exits() {
-    if (file_exists($this->target_file)) {
-      $this->uploadOk = 0;
+        throw new \RuntimeException(self::MESSAGES[$status]);
+      }
+  
+      // validate the file type
+      if (!array_key_exists($this->get_mime_type($tmp), self::ALLOWED_FILES)) {
+        throw new \RuntimeException("The file $filename is not allowed to upload");
+      }
     }
-  }
 
-  private function file_to_big() {
-    if ($this->files["fileToUpload"]["size"] > 500000) {
-      $this->uploadOk = 0;
+
+    // move the files
+    for($i = 0; $i < $file_count; $i++) {
+      $filename = $files['name'][$i];
+      $tmp = $files['tmp_name'][$i];
+      $mime_type = $this->get_mime_type($tmp);
+  
+      // set the filename as the basename + extension
+      $uploadedFile = pathinfo($filename, PATHINFO_FILENAME) . '.' . self::ALLOWED_FILES[$mime_type];
+      $folderStructur = getcwd() . self::UPLOAD_DIR . '/' . str_replace(" ", "", strtolower($name));
+
+      if (!is_dir($folderStructur)) {
+        if (!mkdir($folderStructur) && !is_dir($folderStructur)) {
+          throw new \RuntimeException(sprintf('Directory "%s" was not created', $folderStructur));
+        }
+      }
+
+      // new filepath
+      
+      $filepath = $folderStructur . '/' . $uploadedFile;
+  
+      // move the file to the upload dir
+      $success = move_uploaded_file($tmp, $filepath);
+      if(!$success) {
+        $this->errors[$filename] = "The file $filename was failed to move.";
+      }
     }
+    header("Location: /", true, 303);
+    exit;
   }
 
+  private function get_mime_type(string $filename) {
+    $info = finfo_open(FILEINFO_MIME_TYPE);
+    if (!$info) {
+      return false;
+    }
+
+    $mime_type = finfo_file($info, $filename);
+    finfo_close($info);
+    return $mime_type;
+  }
+
+  /**
+   * Return a human-readable file size
+   *
+   * @param int $bytes
+   * @param int $decimals
+   * @return string
+   */
+  private function format_filesize(int $bytes, int $decimals = 2): string {
+    $units = 'BKMGTP';
+    $factor = floor((strlen($bytes) - 1) / 3);
+
+    return sprintf("%.{$decimals}f", $bytes / (1024 ** $factor)) . $units[(int)$factor];
+  }
 }
