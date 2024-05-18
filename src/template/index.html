@@ -13,8 +13,8 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:image:alt" content="Brylluppét 2024">
 
-    <link rel="stylesheet" href="./vendor/twbs/bootstrap/dist/css/bootstrap.min.css" crossorigin="anonymous">
-    <link rel="stylesheet" href="public/css/main.css">
+    <link rel="stylesheet" href="css/bootstrap.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/main.css">
     <!--
     <link rel="stylesheet" href="css/photoswipe.css">
     <link rel="stylesheet" href="css/default-skin.css">
@@ -25,19 +25,25 @@
   <body>
     <main>
       <div class="hero">
-        <img class="hero" src="public/image/selphi.png" />
+        <img class="hero" src="image/selphi.png" />
         <div class="text">
          <h1>Brylluppét 2024</h1>
         </div>
       </div>
       <div class="container">
-        <form enctype="multipart/form-data" action="/selphi/" method="post">
-          <input id="image" name="image" type="file" accept="image/*">
+        <form enctype="multipart/form-data" action="/" method="post">
+          <input id="image" name="image[]" type="file" multiple accept="image/jpeg">
+          {% if enablednamefield == true %}
           <div class="input-group mb-3">
-            <input name="name" type="text" value="{{ name }}" class="form-control" placeholder="Dit navn" aria-label="Dit navn" aria-describedby="button-addon2">
-            <button class="btn btn-outline-secondary" type="submit" id="button-addon2">Upload</button>
+            <input name="name" type="text" value="" class="form-control" placeholder="Dit navn" aria-label="Dit navn" aria-describedby="button-addon2">
+            <button class="btn btn-outline-primary" type="submit" id="button-addon2">Upload</button>
           </div>
+          {% else %}
+            <button class="btn btn-outline-primary" type="submit" id="button-addon2">Upload</button>
+          {% endif %}
         </form>
+        <hr />
+        <h3>Billeder...</h3>
       </div>
     </main>
   </body>

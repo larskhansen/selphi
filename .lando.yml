@@ -1,0 +1,16 @@
+name: selphi
+recipe: lamp
+config:
+  webroot: public
+  php: 8.1
+  xdebug: true
+services:
+  appserver:
+    build:
+      - mv /app/vendor/twbs/bootstrap/dist/css/bootstrap.css /app/public/css/bootstrap.css
+    overrides:
+      environment:
+        PHP_IDE_CONFIG: "serverName=PHPSTORM"
+        DRUSH_OPTIONS_URI: "http://selphi.lndo.site"
+        XDEBUG_CONFIG: "remote_enable=true remote_host=10.254.254.254 xdebug.remote_port=9000 xdebug.remote_log='/tmp/xdebug.log' xdebug.max_nesting_level=1500"
+  

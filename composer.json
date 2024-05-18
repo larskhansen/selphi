@@ -4,7 +4,8 @@
     "type": "project",
     "require": {
         "twbs/bootstrap": "^5.3",
-        "twig/twig": "^3.0"
+        "twig/twig": "^3.0",
+      "ext-fileinfo": "*"
     },
     "autoload": {
         "psr-4": {
