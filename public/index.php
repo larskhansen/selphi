@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
   $cookie_name = isset($_POST['name']) ? $_POST["name"] : (isset($_COOKIE["name"]) ? $_COOKIE["name"] : "");
   if ($cookie_name !== "") {
     // Set cookie for the name input field and the images.
-    setcookie("name", $cookie_name, time()+86400, "/", "selphi.lndo.site", 1);
+    setcookie("name", $cookie_name, time()+86400, "/", $_SERVER['SERVER_NAME'], false);
     try {
       $selphi->uploadImage($_FILES['image'], $cookie_name);
     } catch (Exception $e) {
