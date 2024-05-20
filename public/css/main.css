@@ -16,3 +16,15 @@
 #image {
   margin-bottom: 0.5rem;
 }
+
+.status {
+  font-weight: bold;
+}
+
+.errors {
+  color: red;
+}
+
+.message {
+  color: green;
+}

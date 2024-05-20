@@ -42,8 +42,20 @@
             <button class="btn btn-outline-primary" type="submit" id="button-addon2">Upload</button>
           {% endif %}
         </form>
+        <div class="status">
+          {% if uploadStatus is iterable %}
+            <div class="errors">
+              {% for status in uploadStatus %}
+                {{ status }} <br />
+              {% endfor %}
+            </div>
+          {% else %}
+            <div class="message">
+              {{ uploadStatus }}
+            </div>
+          {% endif %}
+        </div>
         <hr />
-        <h3>Billeder...</h3>
       </div>
     </main>
   </body>

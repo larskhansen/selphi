@@ -1,36 +1,38 @@
 <?php
-use Larshansen\Selphi\Flash;
 use Larshansen\Selphi\SelPhi;
+use Twig\Environment;
+use Twig\Extension\DebugExtension;
+use Twig\Loader\FilesystemLoader;
 
 session_start();
 
 require '../vendor/autoload.php';
 
-$flash = new Flash();
-
 $selphi = new SelPhi();
-
+$name = $_COOKIE["name"] ?? "";
 if ($_SERVER['REQUEST_METHOD'] === "POST") {
-  $cookie_name = isset($_POST['name']) ? $_POST["name"] : (isset($_COOKIE["name"]) ? $_COOKIE["name"] : "");
-  if ($cookie_name !== "") {
+  $name = isset($_POST['name']) ? $_POST["name"] : $name;
+  if ($name !== "") {
     // Set cookie for the name input field and the images.
-    setcookie("name", $cookie_name, time()+86400, "/", $_SERVER['SERVER_NAME'], false);
+    setcookie("name", $name, time()+86400, "/", $_SERVER['SERVER_NAME'], false);
     try {
-      $selphi->uploadImage($_FILES['image'], $cookie_name);
+      $selphi->uploadImage($_FILES['image'], $name);
     } catch (Exception $e) {
       echo $e->getMessage();
     }
   }
 }
-$name = $_COOKIE['name'] ?? "";
-$loader = new \Twig\Loader\FilesystemLoader('../src/template');
-$twig = new \Twig\Environment($loader, ['debug' => true]);
-$twig->addExtension(new \Twig\Extension\DebugExtension());
+$loader = new FilesystemLoader('../src/template');
+$twig = new Environment($loader, ['debug' => true]);
+$twig->addExtension(new DebugExtension());
+$status = $_SESSION['uploadStatus'] ?? null;
 
 echo $twig->render(
   'index.html', 
   [
     'name' => $name,
     'enablednamefield' => !($name !== ""),
+    'uploadStatus' => $status,
   ]
 );
+$_SESSION['uploadStatus'] = null;
