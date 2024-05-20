@@ -4,6 +4,14 @@ use Twig\Environment;
 use Twig\Extension\DebugExtension;
 use Twig\Loader\FilesystemLoader;
 
+if (isset($_GET['auth']) && $_GET['auth'] === 'FrederiksBerg') {
+  setcookie("auth", $_GET['auth'], time()+86400, "/", $_SERVER['SERVER_NAME'], false);
+}
+if (!isset($_COOKIE['auth'])) {
+  echo 'Mangler en godkendelse';
+  die();
+}
+
 session_start();
 
 require '../vendor/autoload.php';
@@ -25,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === "POST") {
 $loader = new FilesystemLoader('../src/template');
 $twig = new Environment($loader, ['debug' => true]);
 $twig->addExtension(new DebugExtension());
-$status = $_SESSION['uploadStatus'] ?? null;
+$status = $_SESSION['uploadStatus'] ?? "maks ti filer ad gangen.";
 
 echo $twig->render(
   'index.html', 
