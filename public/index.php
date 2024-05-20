@@ -6,6 +6,7 @@ use Twig\Loader\FilesystemLoader;
 
 if (isset($_GET['auth']) && $_GET['auth'] === 'FrederiksBerg') {
   setcookie("auth", $_GET['auth'], time()+86400, "/", $_SERVER['SERVER_NAME'], false);
+  header("Location: /", true, 303);
 }
 if (!isset($_COOKIE['auth'])) {
   echo 'Mangler en godkendelse';
