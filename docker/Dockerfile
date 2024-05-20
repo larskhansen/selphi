@@ -64,11 +64,11 @@ RUN sed -i "s|/var/www/html|$APACHE_DOCUMENT_ROOT|" /etc/apache2/sites-available
     && sed -i '1 i\Listen 8080' /etc/apache2/ports.conf \
     && a2enmod rewrite remoteip \
     && rm -rf /var/www/html \
-    && chown -Rf www-data:www-data $APACHE_DOCUMENT_ROOT
+    && chown -Rf www-data:www-data /var/www
 
 USER www-data
 
 EXPOSE 8080
     
 # Set the working directory.
-WORKDIR /var/www
+WORKDIR /var/www/public
