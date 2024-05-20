@@ -29,13 +29,13 @@ RUN composer update --no-cache
 # Now to the actual docker image
 FROM php:8.1-apache
 
-ADD public .
-ADD src .
-
-ENV APACHE_DOCUMENT_ROOT=/var/www/public
-
 COPY --from=builder /var/www /var/www
 COPY docker/php.ini "$PHP_INI_DIR/php.ini"
+
+ADD public /var/www/public
+ADD src /var/www/src
+
+ENV APACHE_DOCUMENT_ROOT=/var/www/public
 
 # Setup Opcache
 RUN { \
