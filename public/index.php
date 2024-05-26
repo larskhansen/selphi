@@ -4,7 +4,7 @@ use Twig\Environment;
 use Twig\Extension\DebugExtension;
 use Twig\Loader\FilesystemLoader;
 
-if (isset($_GET['auth']) && $_GET['auth'] === 'FrederiksBerg') {
+if (isset($_GET['auth']) && $_GET['auth'] === $_ENV['auth']) {
   setcookie("auth", $_GET['auth'], time()+86400, "/", $_SERVER['SERVER_NAME'], false);
   header("Location: /", true, 303);
 }
