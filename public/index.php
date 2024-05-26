@@ -4,10 +4,7 @@ use Twig\Environment;
 use Twig\Extension\DebugExtension;
 use Twig\Loader\FilesystemLoader;
 
-var_dump($_GET['auth']);<br />
-var_dump($_ENV['auth']);
-exit
-if (isset($_GET['auth']) && $_GET['auth'] == $_ENV['auth']) {
+if (isset($_GET['auth']) && $_GET['auth'] == $_ENV['AUTH']) {
   setcookie("auth", $_GET['auth'], time()+86400, "/", $_SERVER['SERVER_NAME'], false);
   header("Location: /", true, 303);
   exit;
