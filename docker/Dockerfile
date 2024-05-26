@@ -35,6 +35,7 @@ COPY docker/php.ini "$PHP_INI_DIR/php.ini"
 ADD public /var/www/public
 ADD src /var/www/src
 
+ENV AUTH=
 ENV APACHE_DOCUMENT_ROOT=/var/www/public
 
 # Setup Opcache
