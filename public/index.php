@@ -6,7 +6,7 @@ use Twig\Loader\FilesystemLoader;
 
 $auth = getenv('AUTH', true) ?: getenv('AUTH');
 if (isset($_GET['auth']) && $_GET['auth'] == $auth) {
-  setcookie("auth", $_GET['auth'], time()+86400, "/", $_SERVER['SERVER_NAME'], false);
+  setcookie("auth", $_GET['auth'], time()+(86400*5), "/", $_SERVER['SERVER_NAME'], false);
   header("Location: /", true, 303);
   exit;
 }
