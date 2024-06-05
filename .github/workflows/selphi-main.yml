@@ -1,12 +1,12 @@
-name: selphi-master
+name: selphi-main
 
 on:
   push:
     branches:
-      - master
+      - main
   pull_request:
     branches:
-      - master
+      - main
 jobs:
   buildx:
     runs-on: ubuntu-latest
@@ -27,7 +27,7 @@ jobs:
       run: |
         echo ::set-output name=docker_platforms::linux/amd64
         echo ::set-output name=docker_username::larskhansen
-        echo ::set-output name=docker_image_master::docker.io/larskhansen/selphi
+        echo ::set-output name=docker_image_main::docker.io/larskhansen/selphi
         echo ::set-output name=docker_image_develop::docker.io/larskhansen/selphi-dev
         echo ::set-output name=version::${GITHUB_REF#refs/*/}
         echo ::set-output name=hash::${GITHUB_SHA}
@@ -38,13 +38,13 @@ jobs:
         DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
       run: |
         echo "${DOCKER_PASSWORD}" | docker login --username "${{ steps.prepare.outputs.docker_username }}" --password-stdin docker.io
-    - name: Run Buildx (master)
-      if: success() && contains(steps.prepare.outputs.version, 'master')
+    - name: Run Buildx (main)
+      if: success() && contains(steps.prepare.outputs.version, 'main')
       run: |
         docker buildx build \
-          --output type=image,name=${{ steps.prepare.outputs.docker_image_master }},push=true \
+          --output type=image,name=${{ steps.prepare.outputs.docker_image_main }},push=true \
           --platform ${{ steps.prepare.outputs.docker_platforms }} \
-          --tag "${{ steps.prepare.outputs.docker_image_master }}:${{ steps.prepare.outputs.build_number }}" \
+          --tag "${{ steps.prepare.outputs.docker_image_main }}:${{ steps.prepare.outputs.build_number }}" \
           --file docker/Dockerfile .
     - name: Run Buildx (develop)
       if: success() && contains(steps.prepare.outputs.version, 'develop')
