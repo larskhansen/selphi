@@ -92,6 +92,11 @@ class SelPhi {
         $this->errors[$filename] = "The file $filename was failed to move.";
       }
     }
+    if (is_null($this->errors)) {
+      $_SESSION['uploadStatus'] = ($file_count > 1) ? "Filerne er uploadet" : "Filen er uploadet";
+    } else {
+      $_SESSION['uploadStatus'] = $this->errors;
+    }
     header("Location: /", true, 303);
     exit;
   }
