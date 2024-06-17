@@ -1,3 +1,8 @@
+@font-face {
+  font-family: "ab-regular";
+  src: url("AB-Regular.ttf");
+}
+
 body {
   background-color: #EFEEEC;
   background-image: url(../image/blomst.png);
@@ -9,10 +14,12 @@ body {
 
 
 .hero {
+  font-family: 'ab-regular';
   width: 100%;
   max-width: 960px;
   margin: 0 auto;
-  height: auto;
+  text-align: center;
+  font-size:3rem;
 }
 
 .text {
