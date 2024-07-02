@@ -20,18 +20,24 @@ session_start();
 require '../vendor/autoload.php';
 
 $selphi = new SelPhi();
+
 $folders = $selphi->getFolders();
 
 $name = $_COOKIE["name"] ?? "";
 if ($_SERVER['REQUEST_METHOD'] === "POST") {
-  $name = isset($_POST['name']) ? $_POST["name"] : $name;
-  if ($name !== "") {
-    // Set cookie for the name input field and the images.
-    setcookie("name", $name, time()+86400*5, "/", $_SERVER['SERVER_NAME'], false);
-    try {
-      $selphi->uploadImage($_FILES['image'], $name);
-    } catch (Exception $e) {
-      echo $e->getMessage();
+  $folder = getcwd() . $selphi->getUploadDir() . "/" .  str_replace(" ", "", strtolower($name));
+  if (empty($name) && is_dir($folder)) {
+    $_SESSION['uploadStatus'] = "Dette navn er allerede taget, brug et andet.";
+  } else {
+    $name = isset($_POST['name']) ? $_POST["name"] : $name;
+    if ($name !== "") {
+      // Set cookie for the name input field and the images.
+      setcookie("name", $name, time()+86400*5, "/", $_SERVER['SERVER_NAME'], false);
+      try {
+        $selphi->uploadImage($_FILES['image'], $name);
+      } catch (Exception $e) {
+        echo $e->getMessage();
+      }
     }
   }
 }

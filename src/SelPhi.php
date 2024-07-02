@@ -147,4 +147,8 @@ class SelPhi {
     return $returnArray;
   }
 
+  public function getUploadDir() {
+    return self::UPLOAD_DIR;
+  }
+
 }
