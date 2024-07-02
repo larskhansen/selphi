@@ -20,6 +20,8 @@ session_start();
 require '../vendor/autoload.php';
 
 $selphi = new SelPhi();
+$folders = $selphi->getFolders();
+
 $name = $_COOKIE["name"] ?? "";
 if ($_SERVER['REQUEST_METHOD'] === "POST") {
   $name = isset($_POST['name']) ? $_POST["name"] : $name;
@@ -44,6 +46,7 @@ echo $twig->render(
     'name' => $name,
     'enablednamefield' => !($name !== ""),
     'uploadStatus' => $status,
+    'folders' => $folders,
   ]
 );
 $_SESSION['uploadStatus'] = null;

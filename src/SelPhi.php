@@ -125,4 +125,26 @@ class SelPhi {
 
     return sprintf("%.{$decimals}f", $bytes / (1024 ** $factor)) . $units[(int)$factor];
   }
+
+  public function getFolders(): array {
+    $returnArray = [];
+    $files = scandir(getcwd() . self::UPLOAD_DIR);
+    if (isset($_COOKIE['name'])) {
+      $ownFolder = getcwd() . self::UPLOAD_DIR . "/" .  str_replace(" ", "", strtolower($_COOKIE['name']));
+      $test = self::UPLOAD_DIR . "/" .  str_replace(" ", "", strtolower($_COOKIE['name']));
+      if (is_dir($ownFolder)) {
+        $files = scandir($ownFolder);
+        foreach ($files as $file) {
+          $filePath = substr($test . '/' . $file, 1);
+          if (is_file($filePath)) {
+            $returnArray[] = $filePath;
+          }
+        }
+      } else {
+        mkdir($ownFolder);
+      }
+    }
+    return $returnArray;
+  }
+
 }
