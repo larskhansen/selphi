@@ -47,3 +47,11 @@ body {
 .message {
   color: green;
 }
+
+.thumbnail > .btn-group > a {
+  display: none;
+}
+  
+.thumbnail:hover > .btn-group > a {
+  display: block;
+}
