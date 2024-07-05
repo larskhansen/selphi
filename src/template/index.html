@@ -15,11 +15,6 @@
 
     <link rel="stylesheet" href="css/bootstrap.css" crossorigin="anonymous">
     <link rel="stylesheet" href="css/main.css">
-    <!--
-    <link rel="stylesheet" href="css/photoswipe.css">
-    <link rel="stylesheet" href="css/default-skin.css">
-    <link rel="stylesheet" href="css/main.css">
--->
     <title>Selina & Philip - 24.08.2024</title>
   </head>
   <body>
@@ -41,7 +36,7 @@
         </form>
         <div class="status">
           {% if uploadStatus is iterable %}
-            <div class="errors">
+            <div class="errors {{ status }}">
               {% for status in uploadStatus %}
                 {{ status }} <br />
               {% endfor %}
@@ -60,7 +55,7 @@
                 <img src="{{ folder }}" alt="billede" class="img-responsive img-thumbnail image" />
                 <div class="btn-group">
                   <a href="{{ folder }}" class="btn btn-primary">Se</a>
-                  <a href="delete.php?image={{ folder }}" class="btn btn-danger">Slet</a>
+                  <a href="?action=delete&image={{ folder }}" class="btn btn-danger">Slet</a>
                 </div>
               </div>
             </div>
