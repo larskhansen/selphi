@@ -22,7 +22,7 @@ class UploadFile {
     UPLOAD_ERR_EXTENSION => 'Fil typen må ikke uploades på serveren',
 ];
 
-private const MAX_SIZE  = 5 * 1024 * 1024; //  5MB
+private const MAX_SIZE  = 6 * 1024 * 1024; //  5MB
 
   public function __construct(array $files) {
     $this->name = $files['name'];

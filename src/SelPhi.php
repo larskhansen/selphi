@@ -21,7 +21,7 @@ class SelPhi {
   ];
 
   private $errors;
-  private const MAX_SIZE = 5 * 1024 * 1024; //  5MB
+  private const MAX_SIZE = 6 * 1024 * 1024; //  5MB
   
   private const UPLOAD_DIR = '/upload';
 
